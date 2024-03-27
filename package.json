@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "csv-writer": "^1.6.0",
     "purecloud-platform-client-v2": "^190.0.0"
   }
 }
