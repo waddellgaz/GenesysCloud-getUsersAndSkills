@@ -1,10 +1,9 @@
 //Environment info
 const fs = require('fs');
-//const { createObjectCsvWriter } = require('csv-writer');
 const platformClient = require('purecloud-platform-client-v2');
 const client = platformClient.ApiClient.instance;
 client.config.setConfigPath('C:\Git\GenesysCloudCX-bulkDeletion\config\config');
-client.setEnvironment(platformClient.PureCloudRegionHosts.eu_west_2);
+client.setEnvironment(platformClient.PureCloudRegionHosts.eu_west_2);   //change region as needed
 
 //oAuth details, these should be added to your system as an environment variable
 clientId = process.env.GENESYS_CLIENT_ID
@@ -14,13 +13,14 @@ clientSecret = process.env.GENESYS_CLIENT_SECRET
 const authorizationApi = new platformClient.AuthorizationApi();
 const usersApi = new platformClient.UsersApi();
 
-//define options to get skills
+//define options for skills api call
 let skillOpts = {
   'pageSize': 100, // Number | Page size
   'pageNumber': 1, // Number | Page number
   'sortOrder': "ASC" // String | Ascending or descending sort order
 };
 
+//define options for users api call
 let opts = {
   'pageSize': 100, // Number | Page size
   'pageNumber': 1 // Number | Page number
@@ -31,6 +31,7 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+//function to write to csv
 function convertToCSV(data) {
   // Create headers from the keys of the first object
   const headers = Object.keys(data[0]);
@@ -47,8 +48,8 @@ function convertToCSV(data) {
   return csv;
 }
 
-//------------------------- 
 
+//main function which queries API
 async function getSkillsAndLanguages(user) {
   console.log(new Date());
 
@@ -114,60 +115,6 @@ async function main() {
   }
   const csvData = convertToCSV(exportCsv);
   fs.writeFileSync('skills.csv', csvData);
-
-
-  // .then(() => {
-  //   //get users
-  //   usersApi.getUsers(opts)
-  //     .then((data) => {
-  //       console.log(`get user success! data: ${JSON.stringify(data, null, 2)}`);
-  //       data.entities.forEach(async function (user) {
-  //         usersApi.getUserRoutinglanguages(user.id, skillOpts)  //get language skills for the user
-  //           .then((languageData) => {
-  //             languageData.entities.forEach(async function (skill) {  //loop through each skill and add to array
-  //               var jsonObj = { "id": user.id, "name:": user.name, "skill": skill.name, "skillproficiency": skill.proficiency }
-  //               exportCsv.push(jsonObj);
-  //             })
-  //           })
-  //           .catch((err) => {
-  //             console.log('There was a failure calling getUserRoutinglanguages');
-  //             console.error(err);
-  //           });
-  //       });
-
-  //       //loop through each user
-  //       data.entities.forEach(async function (user) {
-  //         //get skills for the user
-  //         usersApi.getUserRoutingskills(user.id, skillOpts)
-  //           .then((dataSkills) => {
-  //             dataSkills.entities.forEach(async function (skill) {
-  //               var jsonObj = { "id": user.id, "name:": user.name, "skill": skill.name, "skillproficiency": skill.proficiency }
-  //               exportCsv.push(jsonObj);
-  //               // Convert data to CSV
-  //               const csv = convertToCSV(exportCsv);
-  //               // Write CSV to a file
-  //               fs.writeFileSync('exportCsv.csv', csv);
-  //             });
-  //           })
-  //           .catch((err) => {
-  //             console.log('There was a failure calling getUserRoutingskills');
-  //             console.error(err);
-  //           });
-  //       });
-  //     })
-  //     .catch((err) => {
-  //       console.log('There was a failure calling getUsers');
-  //       console.error(err);
-  //     });
-  // })
-  //   .catch((err) => {
-  //     // Handle failure response
-  //     console.log(err);
-  //   });
 }
-
-
 let exportCsv = [];
 main();
-
-
